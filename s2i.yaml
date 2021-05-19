@@ -1,0 +1,148 @@
+apiVersion: v1
+items:
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: php-hello
+      app.kubernetes.io/component: php-hello
+      app.kubernetes.io/instance: php-hello
+      name: hello
+    name: php-hello
+  spec:
+    lookupPolicy:
+      local: false
+  status:
+    dockerImageRepository: ""
+- apiVersion: build.openshift.io/v1
+  kind: BuildConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: php-hello
+      app.kubernetes.io/component: php-hello
+      app.kubernetes.io/instance: php-hello
+      name: hello
+    name: php-hello
+  spec:
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: php-hello:latest
+    postCommit: {}
+    resources: {}
+    source:
+      contextDir: ./php-helloworld/
+      git:
+        ref: master
+        uri: https://github.com/Ra-tnt/DO180-apps
+      type: Git
+    strategy:
+      sourceStrategy:
+        from:
+          kind: ImageStreamTag
+          name: php:7.4-ubi8
+          namespace: openshift
+      type: Source
+    triggers:
+    - github:
+        secret: ofIQ9bV32pRz9ZPjvpWR
+      type: GitHub
+    - generic:
+        secret: yM4Uy0MCkODpMMkYl6k8
+      type: Generic
+    - type: ConfigChange
+    - imageChange: {}
+      type: ImageChange
+  status:
+    lastVersion: 0
+- apiVersion: apps.openshift.io/v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: php-hello
+      app.kubernetes.io/component: php-hello
+      app.kubernetes.io/instance: php-hello
+      name: hello
+    name: php-hello
+  spec:
+    replicas: 1
+    selector:
+      deploymentconfig: php-hello
+      name: hello
+    strategy:
+      resources: {}
+    template:
+      metadata:
+        annotations:
+          openshift.io/generated-by: OpenShiftNewApp
+        creationTimestamp: null
+        labels:
+          deploymentconfig: php-hello
+          name: hello
+      spec:
+        containers:
+        - image: php-hello:latest
+          name: php-hello
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          - containerPort: 8443
+            protocol: TCP
+          resources: {}
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - php-hello
+        from:
+          kind: ImageStreamTag
+          name: php-hello:latest
+      type: ImageChange
+  status:
+    availableReplicas: 0
+    latestVersion: 0
+    observedGeneration: 0
+    replicas: 0
+    unavailableReplicas: 0
+    updatedReplicas: 0
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: php-hello
+      app.kubernetes.io/component: php-hello
+      app.kubernetes.io/instance: php-hello
+      name: hello
+    name: php-hello
+  spec:
+    ports:
+    - name: 8080-tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    - name: 8443-tcp
+      port: 8443
+      protocol: TCP
+      targetPort: 8443
+    selector:
+      deploymentconfig: php-hello
+      name: hello
+  status:
+    loadBalancer: {}
+kind: List
+metadata: {}
